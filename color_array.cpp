@@ -3,8 +3,7 @@
 /*
 Run with
 
-g++ color_array.cpp -o color_array
-./color_array>image.ppm
+g++ color_array.cpp -o color_array && ./color_array>image.ppm
 display image.ppm #In case you have ImageMagick installed
 */
 
@@ -13,10 +12,6 @@ int main(){
     // Image parameters
     const int image_width = 256;
     const int image_height = 256;
-
-    int x=10;
-    int y=1;
-    y=y+x;
 
     //File format information: see https://en.wikipedia.org/wiki/Netpbm#PPM_example
     std :: cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
@@ -45,7 +40,7 @@ int main(){
 
     // This is standard error stream. It is unbuffered and we use it to immediately display a
     // message. It can be used to display e.g. errors or temporary messages.
-    std::cerr << "\nDone.\n";
+    std::cerr << "\nDone\n";
 
     // Since ir = 0 at the top left (and 256 at the top right), we should have the corners 
     // should be colored in the following order:
