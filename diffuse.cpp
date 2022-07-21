@@ -7,11 +7,17 @@
 
 #include <iostream>
 
-color ray_color(const ray& r, const hittable& world) {
-
+color ray_color(const ray& r, const hittable& world, int depth) {
     hit_record rec;
-    if (world.hit(r, 0, infinity, rec)) {
-        return 0.5 * (rec.normal + color(1,1,1)); //Adding color(1,1,1), which is just a vector from vec3, makes the sphere brighter
+
+    // If we've exceeded the ray bounce limit, no more light is gathered.
+    if (depth <= 0)
+        return color(0,0,0);
+
+    // Note that this function is recursive. This is because in the diffusive materials the light ray "bounces-off"
+    if (world.hit(r, 0.0, infinity, rec)) {                                                 // The parameter t_min=0.001 here solves the shadow acne: reflections near the floating point approx.
+        point3 target = rec.p + rec.normal + random_in_unit_sphere() /*+ color(10,10,10)*/; // Random contribution for diffusive materials. P + N is the center of the tangent unit sphere OUTSIDE the surface
+        return 1. * ray_color(ray(rec.p, target - rec.p), world, depth-1);                  // color(10,10,10) can be used to make the image brighter                                                                       
     }
 
     vec3 unit_direction = unit_vector(r.direction());
@@ -27,7 +33,8 @@ int main() {
     const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
     const int samples_per_pixel = 100; // Number of samples/rays used to color a pixel. This hels in the anti-aliasing.
-
+    const int max_depth = 50;
+    
     // World
     hittable_list world;
     world.add(make_shared<sphere>(point3(0,0,-1), 0.5));        // Sphere
@@ -57,7 +64,7 @@ int main() {
                 auto u = (i + random_double()) / (image_width-1);
                 auto v = (j + random_double()) / (image_height-1);
                 ray r = cam.get_ray(u, v);
-                pixel_color += ray_color(r, world); // Colors each object in world which is hit
+                pixel_color += ray_color(r, world, max_depth); // Colors each object in world which is hit
             }
 
             write_color(std::cout, pixel_color, samples_per_pixel);

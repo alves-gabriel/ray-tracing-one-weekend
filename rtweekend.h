@@ -35,6 +35,13 @@ inline double random_double(double min, double max) {
     return min + (max-min)*random_double();
 }
 
+// Clamps x in the range (x_min, x_max)
+inline double clamp(double x, double min, double max) {
+    if (x < min) return min;
+    if (x > max) return max;
+    return x;
+}
+
 // Common Headers
 
 #include "ray.h"
