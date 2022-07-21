@@ -6,7 +6,7 @@
 
 // Solution to the quadratic equation t^2 b.b + 2t b.(A-C) + (A-C).(A-C) - r^2 = 0
 // for the intersection between a sphere and the ray. Read "." as the dot product.
-bool hit_sphere(const point3& center, double radius, const ray& r) {
+double hit_sphere(const point3& center, double radius, const ray& r) {
     vec3 oc = r.origin() - center;              // A - C
     auto a = dot(r.direction(), r.direction()); // b.b
     auto b = 2.0 * dot(oc, r.direction());      // 2(A-C).b
