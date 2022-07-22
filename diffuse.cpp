@@ -8,6 +8,7 @@
 #include <iostream>
 
 color ray_color(const ray& r, const hittable& world, int depth) {
+    
     hit_record rec;
 
     // If we've exceeded the ray bounce limit, no more light is gathered.
@@ -15,9 +16,11 @@ color ray_color(const ray& r, const hittable& world, int depth) {
         return color(0,0,0);
 
     // Note that this function is recursive. This is because in the diffusive materials the light ray "bounces-off"
-    if (world.hit(r, 0.0, infinity, rec)) {                                                 // The parameter t_min=0.001 here solves the shadow acne: reflections near the floating point approx.
-        point3 target = rec.p + rec.normal + random_in_unit_sphere() /*+ color(10,10,10)*/; // Random contribution for diffusive materials. P + N is the center of the tangent unit sphere OUTSIDE the surface
-        return 1. * ray_color(ray(rec.p, target - rec.p), world, depth-1);                  // color(10,10,10) can be used to make the image brighter                                                                       
+    if (world.hit(r, 0.001, infinity, rec)) {                                                 // The parameter t_min=0.001 here solves the shadow acne: reflections near the floating point approx.
+        point3 target = rec.p + rec.normal + random_unit_vector();                            // Lambertian reflection
+        //point3 target = rec.p + rec.normal + random_in_unit_sphere() /*+ color(10,10,10)*/; // Random contribution for diffusive materials. P + N is the center of the tangent unit sphere OUTSIDE the surface
+        return .5 * ray_color(ray(rec.p, target - rec.p), world, depth-1);                    // color(10,10,10) can be used to make the image brighter. 
+                                                                                              // The constant factor changs how much we absorb. 0.5 means we absode 50% of the light                                                                       
     }
 
     vec3 unit_direction = unit_vector(r.direction());

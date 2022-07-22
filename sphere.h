@@ -8,7 +8,8 @@
 class sphere : public hittable {
     public:
         sphere() {}
-        sphere(point3 cen, double r) : center(cen), radius(r) {};
+        sphere(point3 cen, double r, shared_ptr<material> m)
+            : center(cen), radius(r), mat_ptr(m) {};
 
         virtual bool hit(
             const ray& r, double t_min, double t_max, hit_record& rec) const override; // Check https://stackoverflow.com/questions/18198314/what-is-the-override-keyword-in-c-used-for
@@ -16,6 +17,7 @@ class sphere : public hittable {
     public:
         point3 center;
         double radius;
+        shared_ptr<material> mat_ptr;
 };
 
 // Accepts a range [t_min, t_max] for the range
@@ -43,6 +45,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
     rec.p = r.at(rec.t);                                // Remember that ray.at(t) is P(t)
     vec3 outward_normal = (rec.p - center) / radius;    // Normal vector constructed from the solution
     rec.set_face_normal(r, outward_normal);             // Decides whether it is outwards or innerwards
+    rec.mat_ptr = mat_ptr;
 
     //rec.normal = (rec.p - center) / radius; // Normal vector constructed from the solution
 

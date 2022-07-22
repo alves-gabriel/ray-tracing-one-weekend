@@ -2,12 +2,16 @@
 #define HITTABLE_H
 
 #include "ray.h"
+#include "rtweekend.h"
+
+class material;
 
 struct hit_record {
     point3 p;
     vec3 normal;
+    shared_ptr<material> mat_ptr;   // Material property. E.g., diffuse, metal etc. This is a pointer to the class material
     double t;
-    bool front_face; // True if hit in the front, False if hit form the back
+    bool front_face;                // True if hit in the front, False if hit form the back
 
     // We use this to decide wheter the object is hit from the inside or the outside
     inline void set_face_normal(const ray& r, const vec3& outward_normal) {

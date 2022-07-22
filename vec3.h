@@ -79,16 +79,14 @@ class vec3 {
         inline static vec3 random(double min, double max) {
             return vec3(random_double(min,max), random_double(min,max), random_double(min,max));
         }
-};
 
-/*Random point inside a unit sphere by rejection*/
-vec3 random_in_unit_sphere() {
-    while (true) {
-        auto p = vec3::random(-1,1);
-        if (p.length_squared() >= 1) continue;
-        return p;
-    }
-}
+        // Deals with zeroes in the Lambert reflecion
+        bool near_zero() const {
+            // Return true if the vector is close to zero in all dimensions.
+            const auto s = 1e-8;
+            return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
+        }
+};
 
 // vec3 Utility Functions
 
@@ -141,6 +139,42 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
 
 inline vec3 unit_vector(vec3 v) {
     return v / v.length();
+}
+
+// Random point inside a unit sphere by rejection
+vec3 random_in_unit_sphere() {
+    while (true) {
+        auto p = vec3::random(-1,1);
+        if (p.length_squared() >= 1) continue;
+        return p;
+    }
+}
+
+// Random unit vector used in the Lambertian reflection
+vec3 random_unit_vector() {
+    return unit_vector(random_in_unit_sphere());
+}
+
+// Equal-angle reflection for metals
+vec3 reflect(const vec3& v, const vec3& n) {
+    return v - 2*dot(v,n)*n;
+}
+
+// Refraction for u given n
+vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat) {
+    auto cos_theta = fmin(dot(-uv, n), 1.0);                                    // First quadrant for R.n = cos(theta)
+    vec3 r_out_perp =  etai_over_etat * (uv + cos_theta*n);                     // R_\{perp}' = eta/eta' (R + cos(theta)n)
+    vec3 r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.length_squared())) * n;   // R_{||} = - sqrt(1-|R_{\perp}'|^2)n
+    return r_out_perp + r_out_parallel;                                         // R = R_{\perp} + R_{||}
+}
+
+// Random point inside unit disk (by rejection)
+vec3 random_in_unit_disk() {
+    while (true) {
+        auto p = vec3(random_double(-1,1), random_double(-1,1), 0);
+        if (p.length_squared() >= 1) continue;
+        return p;
+    }
 }
 
 // Type aliases for vec3
